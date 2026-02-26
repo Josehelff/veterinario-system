@@ -1,7 +1,5 @@
 # Sistema de Gerenciamento Veterinário
 
-Um sistema completo para veterinários controlarem animais, inseminações, prenhezes, nascimentos e desmame com cálculos automáticos de previsões e taxas.
-
 ## 🏗️ Arquitetura
 
 ### Backend
@@ -298,7 +296,7 @@ Exemplo:
 
 ## 🔐 Segurança
 
-Atualmente, o sistema não possui autenticação. Para ambiente de produção, recomenda-se:
+Atualmente, o sistema não possui autenticação.
 - Implementar Spring Security
 - Adicionar JWT para autenticação
 - Validar requisições CORS
@@ -328,14 +326,4 @@ Atualmente, o sistema não possui autenticação. Para ambiente de produção, r
 - RxJS
 - HttpClient
 
-## 📄 Licença
 
-Este projeto é de código aberto e disponível sob a licença MIT.
-
-## 👨‍💻 Autor
-
-Sistema desenvolvido para gerenciamento veterinário de rebanhos.
-
-## 📞 Suporte
-
-Para dúvidas ou sugestões, entre em contato com o desenvolvedor.
