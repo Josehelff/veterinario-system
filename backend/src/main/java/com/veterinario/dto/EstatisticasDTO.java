@@ -38,7 +38,7 @@ public class EstatisticasDTO {
     private Long desmamesPendentes;
 
     // Taxas
-    private Double taxaConcepção;
+    private Double taxaConcepcao;
     private Double taxaPrenhez;
     private Long faltasNoDG;
 }

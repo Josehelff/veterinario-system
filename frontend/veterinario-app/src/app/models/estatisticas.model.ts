@@ -15,7 +15,7 @@ export interface Estatisticas {
   totalDesmames: number;
   desmamesRealizados: number;
   desmamesPendentes: number;
-  taxaConcepção: number;
+  taxaConcepcao: number;
   taxaPrenhez: number;
   faltasNoDG: number;
 }

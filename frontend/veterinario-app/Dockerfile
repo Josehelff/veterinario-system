@@ -12,14 +12,12 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:22-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+COPY --from=builder /app/dist/veterinario-app/browser /usr/share/nginx/html
 
-RUN npm install -g http-server
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY --from=builder /app/dist/veterinario-app/browser ./dist
+EXPOSE 80
 
-EXPOSE 3000
-
-CMD ["http-server", "dist", "-p", "3000", "--cors"]
+CMD ["nginx", "-g", "daemon off;"]

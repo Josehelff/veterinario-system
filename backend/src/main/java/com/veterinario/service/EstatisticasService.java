@@ -85,7 +85,7 @@ public class EstatisticasService {
                 .count());
 
         // Taxas
-        dto.setTaxaConcepção(calcularTaxaConcepção(todasInseminacoes));
+        dto.setTaxaConcepcao(calcularTaxaConcepcao(todasInseminacoes));
         dto.setTaxaPrenhez(calcularTaxaPrenhez(todasInseminacoes));
         dto.setFaltasNoDG(calcularFaltasNoDG(todasInseminacoes));
 
@@ -95,7 +95,7 @@ public class EstatisticasService {
     /**
      * Taxa de Concepção = Total de vacas prenhas / Total de vacas inseminadas
      */
-    private Double calcularTaxaConcepção(List<Inseminacao> inseminacoes) {
+    private Double calcularTaxaConcepcao(List<Inseminacao> inseminacoes) {
         if (inseminacoes.isEmpty()) {
             return 0.0;
         }
