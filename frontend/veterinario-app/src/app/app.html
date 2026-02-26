@@ -1,0 +1,20 @@
+<div class="app-container">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <h1>{{ title }}</h1>
+    </div>
+    <ul class="navbar-menu">
+      <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
+      <li><a routerLink="/animais" routerLinkActive="active">Animais</a></li>
+      <li><a routerLink="/inseminacoes" routerLinkActive="active">Inseminações</a></li>
+    </ul>
+  </nav>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 Sistema Veterinário. Todos os direitos reservados.</p>
+  </footer>
+</div>

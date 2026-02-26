@@ -1,0 +1,97 @@
+<div class="inseminacao-container">
+  <h1>Gerenciamento de Inseminações</h1>
+
+  <div *ngIf="erro" class="erro">
+    <p>{{ erro }}</p>
+  </div>
+
+  <div class="controls">
+    <button (click)="abrirFormulario()" class="btn-primary">+ Nova Inseminação</button>
+    <button (click)="carregarInseminacoes()" class="btn-secondary">Atualizar</button>
+  </div>
+
+  <!-- Formulário -->
+  <div *ngIf="mostraFormulario" class="formulario">
+    <h2>{{ inseminacaoEditando ? 'Editar Inseminação' : 'Nova Inseminação' }}</h2>
+    <form (ngSubmit)="salvarInseminacao()">
+      <div class="form-group">
+        <label>Animal:</label>
+        <select [(ngModel)]="novaInseminacao.animalId" name="animalId" required>
+          <option value="">Selecione um animal</option>
+          <option *ngFor="let animal of animais" [value]="animal.id">
+            {{ animal.brinco }} - {{ animal.nome }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data da Inseminação:</label>
+        <input type="date" [(ngModel)]="novaInseminacao.dataInseminacao" name="dataInseminacao" required>
+      </div>
+      <div class="form-group">
+        <label>Reprodutor:</label>
+        <input [(ngModel)]="novaInseminacao.reprodutor" name="reprodutor">
+      </div>
+      <div class="form-group">
+        <label>Status:</label>
+        <select [(ngModel)]="novaInseminacao.status" name="status">
+          <option value="REALIZADA">Realizada</option>
+          <option value="CANCELADA">Cancelada</option>
+          <option value="REPETIDA">Repetida</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Resultado do Diagnóstico:</label>
+        <select [(ngModel)]="novaInseminacao.resultadoDiagnostico" name="resultadoDiagnostico">
+          <option value="PENDENTE">Pendente</option>
+          <option value="PRENHA">Prenha</option>
+          <option value="NAO_PRENHA">Não Prenha</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Observações:</label>
+        <textarea [(ngModel)]="novaInseminacao.observacoes" name="observacoes"></textarea>
+      </div>
+      <div class="form-buttons">
+        <button type="submit" class="btn-primary">Salvar</button>
+        <button type="button" (click)="fecharFormulario()" class="btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Lista de Inseminações -->
+  <div *ngIf="carregando" class="loading">
+    <p>Carregando inseminações...</p>
+  </div>
+
+  <div *ngIf="!carregando && inseminacoes.length > 0" class="tabela-container">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Animal</th>
+          <th>Data</th>
+          <th>Reprodutor</th>
+          <th>Status</th>
+          <th>Diagnóstico</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let inseminacao of inseminacoes">
+          <td>{{ inseminacao.animalBrinco }} - {{ inseminacao.animalNome }}</td>
+          <td>{{ inseminacao.dataInseminacao | date:'dd/MM/yyyy' }}</td>
+          <td>{{ inseminacao.reprodutor }}</td>
+          <td>{{ inseminacao.status }}</td>
+          <td>{{ inseminacao.resultadoDiagnostico }}</td>
+          <td>
+            <button (click)="editarInseminacao(inseminacao)" class="btn-edit">Editar</button>
+            <button (click)="deletarInseminacao(inseminacao.id!)" class="btn-delete">Deletar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!carregando && inseminacoes.length === 0" class="vazio">
+    <p>Nenhuma inseminação cadastrada</p>
+  </div>
+</div>

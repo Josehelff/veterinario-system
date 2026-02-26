@@ -1,0 +1,118 @@
+<div class="dashboard-container">
+  <h1>Dashboard - Sistema Veterinário</h1>
+
+  <div *ngIf="carregando" class="loading">
+    <p>Carregando estatísticas...</p>
+  </div>
+
+  <div *ngIf="erro" class="erro">
+    <p>{{ erro }}</p>
+  </div>
+
+  <div *ngIf="estatisticas && !carregando" class="stats-grid">
+    <!-- Animais -->
+    <div class="stat-card">
+      <h3>Total de Animais</h3>
+      <p class="stat-value">{{ estatisticas.totalAnimais }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Fêmeas</h3>
+      <p class="stat-value">{{ estatisticas.totalFemeas }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Machos</h3>
+      <p class="stat-value">{{ estatisticas.totalMachos }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Animais Ativos</h3>
+      <p class="stat-value">{{ estatisticas.animaisAtivos }}</p>
+    </div>
+
+    <!-- Inseminações -->
+    <div class="stat-card">
+      <h3>Total Inseminações</h3>
+      <p class="stat-value">{{ estatisticas.totalInseminacoes }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Inseminações Concluídas</h3>
+      <p class="stat-value">{{ estatisticas.inseminacoesConcluidas }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Inseminações Pendentes</h3>
+      <p class="stat-value">{{ estatisticas.inseminacoesPendentes }}</p>
+    </div>
+
+    <!-- Prenhezes -->
+    <div class="stat-card">
+      <h3>Total Prenhezes</h3>
+      <p class="stat-value">{{ estatisticas.totalPrenhezes }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Prenhezes Confirmadas</h3>
+      <p class="stat-value">{{ estatisticas.prenhezesConcluidas }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Prenhezes Abortadas</h3>
+      <p class="stat-value">{{ estatisticas.prenhezesCanceladas }}</p>
+    </div>
+
+    <!-- Nascimentos -->
+    <div class="stat-card">
+      <h3>Total Nascimentos</h3>
+      <p class="stat-value">{{ estatisticas.totalNascimentos }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Nascimentos Vivos</h3>
+      <p class="stat-value">{{ estatisticas.nascimentosVivos }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Nascimentos Mortos</h3>
+      <p class="stat-value">{{ estatisticas.nascimentosMortos }}</p>
+    </div>
+
+    <!-- Desmames -->
+    <div class="stat-card">
+      <h3>Total Desmames</h3>
+      <p class="stat-value">{{ estatisticas.totalDesmames }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Desmames Realizados</h3>
+      <p class="stat-value">{{ estatisticas.desmamesRealizados }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Desmames Pendentes</h3>
+      <p class="stat-value">{{ estatisticas.desmamesPendentes }}</p>
+    </div>
+
+    <!-- Taxas -->
+    <div class="stat-card taxa">
+      <h3>Taxa de Concepção</h3>
+      <p class="stat-value">{{ estatisticas.taxaConcepção.toFixed(2) }}%</p>
+    </div>
+
+    <div class="stat-card taxa">
+      <h3>Taxa de Prenhez</h3>
+      <p class="stat-value">{{ estatisticas.taxaPrenhez.toFixed(2) }}%</p>
+    </div>
+
+    <div class="stat-card taxa">
+      <h3>Faltaram no DG</h3>
+      <p class="stat-value">{{ estatisticas.faltasNoDG }}</p>
+    </div>
+  </div>
+
+  <div class="refresh-button">
+    <button (click)="carregarEstatisticas()">Atualizar</button>
+  </div>
+</div>
