@@ -10,7 +10,7 @@
 
 ### Frontend
 - **Tecnologia**: Angular 18+
-- **Estilo**: CSS puro
+- **Estilo**: CSS 
 - **Porta**: 4200
 
 ## 📁 Estrutura do Projeto
