@@ -1,6 +1,6 @@
 # Sistema de Gerenciamento Veterinário
 
-## 🏗️ Arquitetura
+##  Arquitetura
 
 ### Backend
 - **Tecnologia**: Java 11 + Spring Boot 2.7.14
@@ -13,7 +13,7 @@
 - **Estilo**: CSS 
 - **Porta**: 4200
 
-## 📁 Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
 veterinario-system/
@@ -46,7 +46,7 @@ veterinario-system/
 └── README.md
 ```
 
-## 🚀 Como Executar
+##  Como Executar
 
 ### Backend
 
@@ -98,7 +98,7 @@ A aplicação estará disponível em: `http://localhost:4200`
 ng build --configuration production
 ```
 
-## 📊 Funcionalidades Principais
+##  Funcionalidades Principais
 
 ### 1. Cadastro de Animais
 - Registrar animais com informações completas (brinco, nome, tipo, sexo, data de nascimento, raça, peso)
@@ -150,7 +150,7 @@ Exemplo:
 - 75 passaram no DG
 - **Resultado: 5 faltaram**
 
-## 🔌 Endpoints da API
+##  Endpoints da API
 
 ### Animais
 - `GET /api/animais` - Listar todos
@@ -203,7 +203,7 @@ Exemplo:
 ### Estatísticas
 - `GET /api/estatisticas` - Obter todas as estatísticas
 
-## 📱 Interface do Usuário
+##  Interface do Usuário
 
 ### Dashboard
 - Visualização geral de estatísticas
@@ -236,7 +236,7 @@ Exemplo:
 - Cálculo automático de previsão de desmame
 - Registro de peso ao desmame
 
-## 🗄️ Modelo de Dados
+##  Modelo de Dados
 
 ### Animal
 - `id` (Long)
@@ -294,14 +294,14 @@ Exemplo:
 - `observacoes` (String)
 - `status` (Enum: PENDENTE, REALIZADO, CANCELADO)
 
-## 🔐 Segurança
+##  Segurança
 
 Atualmente, o sistema não possui autenticação.
 - Implementar Spring Security
 - Adicionar JWT para autenticação
 - Validar requisições CORS
 
-## 📝 Regras de Negócio
+##  Regras de Negócio
 
 1. **Previsão de Nascimento**: Data da cobertura + período de gestação (285, 292 ou customizado)
 2. **Previsão de Desmame**: Data do nascimento + dias definidos (90, 210, 240 ou customizado)
@@ -309,7 +309,7 @@ Atualmente, o sistema não possui autenticação.
 4. **Taxa de Prenhez**: Calculada com base em diagnósticos realizados
 5. **Faltou no DG**: Diferença entre inseminadas e que passaram no diagnóstico
 
-## 🛠️ Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 
 ### Backend
 - Java 11
