@@ -22,6 +22,7 @@ public class AnimalDTO {
     private LocalDate dataNascimento;
     private String raca;
     private Double peso;
+    private String proprietario;
     private String observacoes;
     private Animal.StatusAnimal status;
 }

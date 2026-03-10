@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Veterinário</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; color: #333; }
+
+    /* NAVBAR */
+    .navbar {
+      background: linear-gradient(135deg, #1a6b3c, #2e8b57);
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      position: sticky; top: 0; z-index: 1000;
+    }
+    .navbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1400px; margin: 0 auto; padding: 0 20px;
+    }
+    .navbar-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.3rem; font-weight: 700; padding: 15px 0;
+    }
+    .navbar-brand span { font-size: 1.6rem; }
+    .fazenda-selector {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.15); border-radius: 10px;
+      padding: 8px 14px; margin-left: 10px;
+    }
+    .fazenda-selector label { font-size: 0.8rem; color: rgba(255,255,255,0.8); white-space: nowrap; }
+    .fazenda-select {
+      background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+      color: white; border-radius: 6px; padding: 5px 10px; font-size: 0.85rem;
+      cursor: pointer; min-width: 180px;
+    }
+    .fazenda-select option { background: #1a6b3c; color: white; }
+    .fazenda-badge {
+      background: rgba(255,255,255,0.25); border-radius: 20px;
+      padding: 3px 10px; font-size: 0.75rem; font-weight: 600;
+      white-space: nowrap;
+    }
+    .navbar-nav { display: flex; gap: 5px; }
+    .nav-btn {
+      background: transparent; border: none; color: rgba(255,255,255,0.85);
+      padding: 12px 16px; cursor: pointer; font-size: 0.9rem; border-radius: 6px;
+      transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    }
+    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.2); color: white; }
+    .nav-btn .icon { font-size: 1.1rem; }
+
+    /* MAIN */
+    .main { max-width: 1400px; margin: 0 auto; padding: 25px 20px; }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* CARDS DASHBOARD */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 30px;
+    }
+    .stat-card {
+      background: white; border-radius: 12px; padding: 22px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-left: 5px solid;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+    .stat-card.green { border-color: #2e8b57; }
+    .stat-card.blue { border-color: #2196F3; }
+    .stat-card.orange { border-color: #FF9800; }
+    .stat-card.purple { border-color: #9C27B0; }
+    .stat-card.red { border-color: #f44336; }
+    .stat-card.teal { border-color: #009688; }
+    .stat-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: #333; }
+    .stat-sub { font-size: 0.8rem; color: #aaa; margin-top: 4px; }
+
+    /* TAXAS */
+    .taxas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 30px; }
+    .taxa-card {
+      background: white; border-radius: 12px; padding: 22px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .taxa-title { font-size: 0.9rem; color: #666; margin-bottom: 12px; font-weight: 600; }
+    .taxa-bar { background: #e0e0e0; border-radius: 10px; height: 12px; overflow: hidden; margin-bottom: 8px; }
+    .taxa-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+    .taxa-fill.green { background: linear-gradient(90deg, #2e8b57, #4CAF50); }
+    .taxa-fill.blue { background: linear-gradient(90deg, #1976D2, #42A5F5); }
+    .taxa-fill.orange { background: linear-gradient(90deg, #E65100, #FF9800); }
+    .taxa-percent { font-size: 1.6rem; font-weight: 700; }
+    .taxa-detail { font-size: 0.8rem; color: #888; }
+
+    /* PAGE HEADER */
+    .page-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 25px;
+    }
+    .page-title { font-size: 1.6rem; font-weight: 700; color: #1a6b3c; }
+    .page-title small { font-size: 0.9rem; color: #888; font-weight: 400; display: block; }
+
+    /* BUTTONS */
+    .btn {
+      padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;
+      font-size: 0.9rem; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: #2e8b57; color: white; }
+    .btn-primary:hover { background: #1a6b3c; }
+    .btn-danger { background: #f44336; color: white; }
+    .btn-danger:hover { background: #c62828; }
+    .btn-warning { background: #FF9800; color: white; }
+    .btn-warning:hover { background: #E65100; }
+    .btn-info { background: #2196F3; color: white; }
+    .btn-info:hover { background: #1565C0; }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+    /* TABLE */
+    .table-container {
+      background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); overflow: hidden;
+    }
+    .table-toolbar {
+      padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    }
+    .search-input {
+      padding: 8px 14px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 0.9rem; flex: 1; min-width: 200px;
+    }
+    .search-input:focus { outline: none; border-color: #2e8b57; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #f8f9fa; }
+    th { padding: 12px 16px; text-align: left; font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e0e0e0; }
+    td { padding: 13px 16px; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
+    tr:hover td { background: #f8fffe; }
+    tr:last-child td { border-bottom: none; }
+
+    /* BADGES */
+    .badge {
+      padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block;
+    }
+    .badge-success { background: #e8f5e9; color: #2e7d32; }
+    .badge-warning { background: #fff3e0; color: #e65100; }
+    .badge-danger { background: #ffebee; color: #c62828; }
+    .badge-info { background: #e3f2fd; color: #1565c0; }
+    .badge-secondary { background: #f5f5f5; color: #616161; }
+    .badge-purple { background: #f3e5f5; color: #6a1b9a; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 2000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px; width: 90%; max-width: 600px;
+      max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      padding: 20px 24px; border-bottom: 1px solid #f0f0f0;
+      display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(135deg, #1a6b3c, #2e8b57); color: white; border-radius: 16px 16px 0 0;
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* FORM */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-row.single { grid-template-columns: 1fr; }
+    .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: #555; }
+    .form-control {
+      padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 0.9rem; transition: border-color 0.2s;
+    }
+    .form-control:focus { outline: none; border-color: #2e8b57; box-shadow: 0 0 0 3px rgba(46,139,87,0.1); }
+    select.form-control { cursor: pointer; }
+
+    /* ALERT */
+    .alert {
+      padding: 14px 18px; border-radius: 8px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .alert-info { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+    .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .alert-warning { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 60px 20px; color: #aaa; }
+    .empty-state .icon { font-size: 4rem; margin-bottom: 16px; }
+    .empty-state p { font-size: 1rem; }
+
+    /* LOADING */
+    .loading { text-align: center; padding: 40px; color: #888; }
+    .spinner {
+      width: 40px; height: 40px; border: 4px solid #e0e0e0;
+      border-top-color: #2e8b57; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* PREVISAO CARD */
+    .previsao-info {
+      background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px;
+      padding: 12px 16px; margin-top: 10px; font-size: 0.85rem; color: #2e7d32;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .form-row { grid-template-columns: 1fr; }
+      .form-row.triple { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .navbar-nav { display: none; }
+    }
+
+    /* TOAST */
+    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast {
+      background: #333; color: white; padding: 14px 20px; border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-size: 0.9rem;
+      animation: slideIn 0.3s ease; min-width: 250px; display: flex; align-items: center; gap: 10px;
+    }
+    .toast.success { background: #2e7d32; }
+    .toast.error { background: #c62828; }
+    .toast.warning { background: #e65100; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* SECTION TITLE */
+    .section-title { font-size: 1.1rem; font-weight: 700; color: #444; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+
+    /* DETAIL ROW */
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .detail-item { background: #f8f9fa; border-radius: 8px; padding: 12px 16px; }
+    .detail-item label { font-size: 0.75rem; color: #888; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .detail-item span { font-size: 0.95rem; font-weight: 600; color: #333; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="navbar-brand">
+      <span>🐄</span> Sistema Veterinário
+      <div class="fazenda-selector">
+        <label>🏡 Fazenda:</label>
+        <select class="fazenda-select" id="fazenda-select" onchange="changeFazenda(this.value)">
+          <option value="">Todas as Fazendas</option>
+          <option value="Santa Rita">🌿 Fazenda Santa Rita</option>
+          <option value="Boa Vista">🌄 Fazenda Boa Vista</option>
+          <option value="São João">🌾 Fazenda São João</option>
+        </select>
+      </div>
+    </div>
+    <div class="navbar-nav">
+      <button class="nav-btn active" onclick="showPage('dashboard')"><span class="icon">📊</span> Dashboard</button>
+      <button class="nav-btn" onclick="showPage('animais')"><span class="icon">🐄</span> Animais</button>
+      <button class="nav-btn" onclick="showPage('inseminacoes')"><span class="icon">🔬</span> Inseminações</button>
+      <button class="nav-btn" onclick="showPage('prenhezes')"><span class="icon">🤰</span> Prenhezes</button>
+      <button class="nav-btn" onclick="showPage('nascimentos')"><span class="icon">🐣</span> Nascimentos</button>
+      <button class="nav-btn" onclick="showPage('desmames')"><span class="icon">🍼</span> Desmames</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-header">
+      <div class="page-title">Dashboard <small>Visão geral do rebanho</small></div>
+      <button class="btn btn-primary" onclick="loadDashboard()">🔄 Atualizar</button>
+    </div>
+    <div id="dashboard-content">
+      <div class="loading"><div class="spinner"></div>Carregando...</div>
+    </div>
+  </div>
+
+  <!-- ANIMAIS -->
+  <div id="page-animais" class="page">
+    <div class="page-header">
+      <div class="page-title">Animais <small>Cadastro do rebanho</small></div>
+      <button class="btn btn-primary" onclick="openModal('modal-animal')">➕ Novo Animal</button>
+    </div>
+    <div class="table-container">
+      <div class="table-toolbar">
+        <input type="text" class="search-input" placeholder="🔍 Buscar por brinco ou nome..." oninput="filterTable('table-animais', this.value)">
+      </div>
+      <div id="table-animais-container">
+        <div class="loading"><div class="spinner"></div>Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSEMINAÇÕES -->
+  <div id="page-inseminacoes" class="page">
+    <div class="page-header">
+      <div class="page-title">Inseminações / Coberturas <small>Controle reprodutivo</small></div>
+      <button class="btn btn-primary" onclick="openModal('modal-inseminacao')">➕ Nova Inseminação</button>
+    </div>
+    <div class="table-container">
+      <div class="table-toolbar">
+        <input type="text" class="search-input" placeholder="🔍 Buscar..." oninput="filterTable('table-inseminacoes', this.value)">
+      </div>
+      <div id="table-inseminacoes-container">
+        <div class="loading"><div class="spinner"></div>Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRENHEZES -->
+  <div id="page-prenhezes" class="page">
+    <div class="page-header">
+      <div class="page-title">Prenhezes <small>Diagnóstico de gestação (DG)</small></div>
+      <button class="btn btn-primary" onclick="openModal('modal-prenhez')">➕ Nova Prenhez</button>
+    </div>
+    <div class="table-container">
+      <div class="table-toolbar">
+        <input type="text" class="search-input" placeholder="🔍 Buscar..." oninput="filterTable('table-prenhezes', this.value)">
+      </div>
+      <div id="table-prenhezes-container">
+        <div class="loading"><div class="spinner"></div>Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NASCIMENTOS -->
+  <div id="page-nascimentos" class="page">
+    <div class="page-header">
+      <div class="page-title">Nascimentos <small>Registro de partos</small></div>
+      <button class="btn btn-primary" onclick="openModal('modal-nascimento')">➕ Registrar Nascimento</button>
+    </div>
+    <div class="table-container">
+      <div class="table-toolbar">
+        <input type="text" class="search-input" placeholder="🔍 Buscar..." oninput="filterTable('table-nascimentos', this.value)">
+      </div>
+      <div id="table-nascimentos-container">
+        <div class="loading"><div class="spinner"></div>Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESMAMES -->
+  <div id="page-desmames" class="page">
+    <div class="page-header">
+      <div class="page-title">Desmames <small>Controle de desmame</small></div>
+      <button class="btn btn-primary" onclick="openModal('modal-desmame')">➕ Registrar Desmame</button>
+    </div>
+    <div class="table-container">
+      <div class="table-toolbar">
+        <input type="text" class="search-input" placeholder="🔍 Buscar..." oninput="filterTable('table-desmames', this.value)">
+      </div>
+      <div id="table-desmames-container">
+        <div class="loading"><div class="spinner"></div>Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAIS -->
+
+<!-- Modal Animal -->
+<div class="modal-overlay" id="modal-animal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🐄 Cadastrar Animal</span>
+      <button class="modal-close" onclick="closeModal('modal-animal')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-animal">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Brinco / Identificação *</label>
+            <input type="text" class="form-control" id="animal-brinco" placeholder="Ex: 001" required>
+          </div>
+          <div class="form-group">
+            <label>Nome</label>
+            <input type="text" class="form-control" id="animal-nome" placeholder="Ex: Mimosa">
+          </div>
+        </div>
+        <div class="form-row triple">
+          <div class="form-group">
+            <label>Tipo *</label>
+            <select class="form-control" id="animal-tipo" required>
+              <option value="">Selecione...</option>
+              <option value="BOVINO">Bovino</option>
+              <option value="EQUINO">Equino</option>
+              <option value="SUINO">Suíno</option>
+              <option value="OVINO">Ovino</option>
+              <option value="CAPRINO">Caprino</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Sexo *</label>
+            <select class="form-control" id="animal-sexo" required>
+              <option value="">Selecione...</option>
+              <option value="FEMEA">Fêmea</option>
+              <option value="MACHO">Macho</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" id="animal-status">
+              <option value="ATIVO">Ativo</option>
+              <option value="INATIVO">Inativo</option>
+              <option value="VENDIDO">Vendido</option>
+              <option value="MORTO">Morto</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data de Nascimento</label>
+            <input type="date" class="form-control" id="animal-dataNascimento">
+          </div>
+          <div class="form-group">
+            <label>Raça</label>
+            <input type="text" class="form-control" id="animal-raca" placeholder="Ex: Nelore">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Peso (kg)</label>
+            <input type="number" class="form-control" id="animal-peso" placeholder="Ex: 450" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>Proprietário</label>
+            <input type="text" class="form-control" id="animal-proprietario" placeholder="Nome do proprietário">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea class="form-control" id="animal-observacoes" rows="3" placeholder="Observações gerais..."></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warning" onclick="closeModal('modal-animal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAnimal()">💾 Salvar Animal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Inseminação -->
+<div class="modal-overlay" id="modal-inseminacao">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🔬 Registrar Inseminação</span>
+      <button class="modal-close" onclick="closeModal('modal-inseminacao')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-inseminacao">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Animal (Fêmea) *</label>
+            <select class="form-control" id="ins-animalId" required onchange="updateInsPrevisao()">
+              <option value="">Selecione a fêmea...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data da Cobertura *</label>
+            <input type="date" class="form-control" id="ins-dataCobertura" required onchange="updateInsPrevisao()">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select class="form-control" id="ins-tipo">
+              <option value="INSEMINACAO_ARTIFICIAL">Inseminação Artificial</option>
+              <option value="MONTA_NATURAL">Monta Natural</option>
+              <option value="TRANSFERENCIA_EMBRIAO">Transferência de Embrião</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Reprodutor / Touro</label>
+            <input type="text" class="form-control" id="ins-reprodutor" placeholder="Nome ou código do reprodutor">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Período de Gestação (dias)</label>
+            <select class="form-control" id="ins-periodoGestacao" onchange="updateInsPrevisao()">
+              <option value="285">285 dias (padrão bovino)</option>
+              <option value="292">292 dias</option>
+              <option value="custom">Personalizado...</option>
+            </select>
+          </div>
+          <div class="form-group" id="ins-custom-periodo-group" style="display:none">
+            <label>Dias personalizados</label>
+            <input type="number" class="form-control" id="ins-periodoCustom" placeholder="Ex: 290" min="200" max="400" onchange="updateInsPrevisao()">
+          </div>
+        </div>
+        <div id="ins-previsao-info" class="previsao-info" style="display:none">
+          📅 <strong>Previsão de Nascimento:</strong> <span id="ins-previsao-data"></span>
+        </div>
+        <div class="form-row single" style="margin-top:16px">
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea class="form-control" id="ins-observacoes" rows="3" placeholder="Observações..."></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warning" onclick="closeModal('modal-inseminacao')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarInseminacao()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Prenhez -->
+<div class="modal-overlay" id="modal-prenhez">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🤰 Registrar Prenhez (DG)</span>
+      <button class="modal-close" onclick="closeModal('modal-prenhez')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-prenhez">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Inseminação *</label>
+            <select class="form-control" id="prn-inseminacaoId" required>
+              <option value="">Selecione a inseminação...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data do DG *</label>
+            <input type="date" class="form-control" id="prn-dataDiagnostico" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Resultado *</label>
+            <select class="form-control" id="prn-resultado" required>
+              <option value="">Selecione...</option>
+              <option value="PRENHA">Prenha ✅</option>
+              <option value="VAZIA">Vazia ❌</option>
+              <option value="PENDENTE">Pendente ⏳</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Previsão de Nascimento</label>
+            <input type="date" class="form-control" id="prn-previsaoNascimento">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea class="form-control" id="prn-observacoes" rows="3" placeholder="Observações do DG..."></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warning" onclick="closeModal('modal-prenhez')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPrenhez()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nascimento -->
+<div class="modal-overlay" id="modal-nascimento">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🐣 Registrar Nascimento</span>
+      <button class="modal-close" onclick="closeModal('modal-nascimento')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-nascimento">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prenhez *</label>
+            <select class="form-control" id="nasc-prenhezId" required onchange="updateNascPrevisao()">
+              <option value="">Selecione a prenhez...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data do Nascimento *</label>
+            <input type="date" class="form-control" id="nasc-dataNascimento" required onchange="updateNascPrevisao()">
+          </div>
+        </div>
+        <div class="form-row triple">
+          <div class="form-group">
+            <label>Status *</label>
+            <select class="form-control" id="nasc-status" required>
+              <option value="VIVO">Vivo ✅</option>
+              <option value="MORTO">Morto ❌</option>
+              <option value="NATIMORTO">Natimorto</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Sexo do Filhote</label>
+            <select class="form-control" id="nasc-sexo">
+              <option value="">Não identificado</option>
+              <option value="MACHO">Macho</option>
+              <option value="FEMEA">Fêmea</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Peso ao Nascer (kg)</label>
+            <input type="number" class="form-control" id="nasc-peso" placeholder="Ex: 35" step="0.1">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Brinco do Filhote</label>
+            <input type="text" class="form-control" id="nasc-brincoFilhote" placeholder="Ex: 100">
+          </div>
+          <div class="form-group">
+            <label>Dias para Desmame</label>
+            <select class="form-control" id="nasc-diasDesmame" onchange="updateNascPrevisao()">
+              <option value="90">90 dias</option>
+              <option value="210">210 dias</option>
+              <option value="240">240 dias</option>
+              <option value="custom">Personalizado...</option>
+            </select>
+          </div>
+        </div>
+        <div id="nasc-desmame-info" class="previsao-info" style="display:none">
+          🍼 <strong>Previsão de Desmame:</strong> <span id="nasc-desmame-data"></span>
+        </div>
+        <div class="form-row single" style="margin-top:16px">
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea class="form-control" id="nasc-observacoes" rows="3" placeholder="Observações do parto..."></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warning" onclick="closeModal('modal-nascimento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNascimento()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Desmame -->
+<div class="modal-overlay" id="modal-desmame">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🍼 Registrar Desmame</span>
+      <button class="modal-close" onclick="closeModal('modal-desmame')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-desmame">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nascimento *</label>
+            <select class="form-control" id="dsm-nascimentoId" required>
+              <option value="">Selecione o nascimento...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Data do Desmame *</label>
+            <input type="date" class="form-control" id="dsm-dataDesmame" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Peso no Desmame (kg)</label>
+            <input type="number" class="form-control" id="dsm-peso" placeholder="Ex: 180" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" id="dsm-status">
+              <option value="REALIZADO">Realizado ✅</option>
+              <option value="PENDENTE">Pendente ⏳</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea class="form-control" id="dsm-observacoes" rows="3" placeholder="Observações do desmame..."></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warning" onclick="closeModal('modal-desmame')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarDesmame()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// URL do backend: definida pela variável de ambiente BACKEND_URL (injetada no build)
+const API = (window.__BACKEND_URL__ || 'BACKEND_URL_PLACEHOLDER') + '/api';
+let FAZENDA_ATUAL = '';
+
+function changeFazenda(fazenda) {
+  FAZENDA_ATUAL = fazenda;
+  const page = document.querySelector('.page.active');
+  if (page) {
+    const pageId = page.id.replace('page-', '');
+    if (pageId === 'dashboard') loadDashboard();
+    else if (pageId === 'animais') loadAnimais();
+    else if (pageId === 'inseminacoes') loadInseminacoes();
+    else if (pageId === 'prenhezes') loadPrenhezes();
+    else if (pageId === 'nascimentos') loadNascimentos();
+    else if (pageId === 'desmames') loadDesmames();
+  }
+  // Atualizar badge de fazenda
+  const label = fazenda ? `🏡 ${fazenda}` : '🌎 Todas as Fazendas';
+  document.title = `Sistema Veterinário${fazenda ? ' — ' + fazenda : ''}`;
+}
+
+// ===== UTILS =====
+function fmt(date) {
+  if (!date) return '-';
+  const d = new Date(date + 'T12:00:00');
+  return d.toLocaleDateString('pt-BR');
+}
+function fmtPct(v) { return v ? v.toFixed(1) + '%' : '0.0%'; }
+function addDays(dateStr, days) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + parseInt(days));
+  return d.toLocaleDateString('pt-BR');
+}
+function addDaysISO(dateStr, days) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + parseInt(days));
+  return d.toISOString().split('T')[0];
+}
+
+function toast(msg, type = 'success') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = (type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️') + ' ' + msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+async function api(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  if (!r.ok) throw new Error(`Erro ${r.status}: ${await r.text()}`);
+  if (r.status === 204) return null;
+  return r.json();
+}
+
+// ===== NAVIGATION =====
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(page.substring(0,4))) b.classList.add('active');
+  });
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'animais') loadAnimais();
+  if (page === 'inseminacoes') loadInseminacoes();
+  if (page === 'prenhezes') loadPrenhezes();
+  if (page === 'nascimentos') loadNascimentos();
+  if (page === 'desmames') loadDesmames();
+}
+
+// ===== MODAL =====
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'modal-inseminacao') loadFemeasSelect();
+  if (id === 'modal-prenhez') loadInseminacoesSelect();
+  if (id === 'modal-nascimento') loadPrenhezesPrenhasSelect();
+  if (id === 'modal-desmame') loadNascimentosSelect();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ===== FILTER TABLE =====
+function filterTable(tableId, query) {
+  const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+  const q = query.toLowerCase();
+  rows.forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard() {
+  document.getElementById('dashboard-content').innerHTML = '<div class="loading"><div class="spinner"></div>Carregando estatísticas...</div>';
+  try {
+    // Buscar todos os dados e filtrar por fazenda
+    const [allAnimais, allInsems, allPrenhezes, allNasc, allDesm] = await Promise.all([
+      api('/animais'), api('/inseminacoes'), api('/prenhezes'), api('/nascimentos'), api('/desmames')
+    ]);
+
+    // Filtrar por fazenda
+    const animais = FAZENDA_ATUAL ? allAnimais.filter(a => (a.proprietario || '').includes(FAZENDA_ATUAL)) : allAnimais;
+    const animalIds = new Set(animais.map(a => a.id));
+    const insems = allInsems.filter(i => animalIds.has(i.animalId));
+    const prenhezes = allPrenhezes.filter(p => animalIds.has(p.animalId));
+    const nasc = allNasc.filter(n => animalIds.has(n.animalId));
+    const desm = allDesm.filter(d => animalIds.has(d.animalId));
+
+    // Calcular estatísticas
+    const prenhas = insems.filter(i => i.resultadoDiagnostico === 'PRENHA').length;
+    const comDG = insems.filter(i => i.dataDiagnostico).length;
+    const taxaConcepcao = insems.length > 0 ? (prenhas / insems.length) * 100 : 0;
+    const taxaPrenhez = comDG > 0 ? (prenhas / comDG) * 100 : 0;
+    const faltasDG = insems.length - comDG;
+
+    const s = {
+      totalAnimais: animais.length,
+      animaisAtivos: animais.filter(a => a.status === 'ATIVO').length,
+      totalFemeas: animais.filter(a => a.sexo === 'FEMEA').length,
+      totalMachos: animais.filter(a => a.sexo === 'MACHO').length,
+      totalInseminacoes: insems.length,
+      inseminacoesPendentes: insems.filter(i => i.resultadoDiagnostico === 'PENDENTE').length,
+      inseminacoesConcluidas: insems.filter(i => i.resultadoDiagnostico !== 'PENDENTE').length,
+      totalPrenhezes: prenhezes.length,
+      prenhezesConcluidas: prenhezes.filter(p => p.status === 'CONFIRMADA').length,
+      prenhezesCanceladas: prenhezes.filter(p => p.status === 'CANCELADA').length,
+      totalNascimentos: nasc.length,
+      nascimentosVivos: nasc.filter(n => n.statusNascimento === 'VIVO').length,
+      nascimentosMortos: nasc.filter(n => n.statusNascimento === 'MORTO' || n.statusNascimento === 'NATIMORTO').length,
+      totalDesmames: desm.length,
+      desmamesRealizados: desm.filter(d => d.status === 'REALIZADO').length,
+      desmamesPendentes: desm.filter(d => d.status === 'PENDENTE').length,
+      taxaConcepcao, taxaPrenhez, faltasNoDG: faltasDG
+    };
+
+    const fazendaInfo = FAZENDA_ATUAL ? `<div class="alert alert-info" style="margin-bottom:20px">🏡 Exibindo dados da <strong>${FAZENDA_ATUAL}</strong> — ${animais.filter(a=>a.sexo==='FEMEA').length} fêmeas em reprodução</div>` : `<div class="alert alert-info" style="margin-bottom:20px">🌎 Exibindo dados de <strong>todas as fazendas</strong> — ${animais.length} animais no total</div>`;
+    document.getElementById('dashboard-content').innerHTML = fazendaInfo + `
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Total de Animais</div>
+          <div class="stat-value">${s.totalAnimais}</div>
+          <div class="stat-sub">${s.animaisAtivos} ativos</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Fêmeas</div>
+          <div class="stat-value">${s.totalFemeas}</div>
+          <div class="stat-sub">em reprodução</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Inseminações</div>
+          <div class="stat-value">${s.totalInseminacoes}</div>
+          <div class="stat-sub">${s.inseminacoesPendentes} pendentes</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Prenhezes</div>
+          <div class="stat-value">${s.totalPrenhezes}</div>
+          <div class="stat-sub">${s.prenhezesConcluidas} confirmadas</div>
+        </div>
+        <div class="stat-card teal">
+          <div class="stat-label">Nascimentos</div>
+          <div class="stat-value">${s.totalNascimentos}</div>
+          <div class="stat-sub">${s.nascimentosVivos} vivos</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Desmames</div>
+          <div class="stat-value">${s.totalDesmames}</div>
+          <div class="stat-sub">${s.desmamesRealizados} realizados</div>
+        </div>
+      </div>
+
+      <div class="section-title">📊 Taxas Reprodutivas</div>
+      <div class="taxas-grid">
+        <div class="taxa-card">
+          <div class="taxa-title">🎯 Taxa de Concepção</div>
+          <div class="taxa-bar"><div class="taxa-fill green" style="width:${Math.min(s.taxaConcepcao,100)}%"></div></div>
+          <div class="taxa-percent" style="color:#2e7d32">${fmtPct(s.taxaConcepcao)}</div>
+          <div class="taxa-detail">Vacas prenhas / Total inseminadas</div>
+        </div>
+        <div class="taxa-card">
+          <div class="taxa-title">🔬 Taxa de Prenhez</div>
+          <div class="taxa-bar"><div class="taxa-fill blue" style="width:${Math.min(s.taxaPrenhez,100)}%"></div></div>
+          <div class="taxa-percent" style="color:#1565c0">${fmtPct(s.taxaPrenhez)}</div>
+          <div class="taxa-detail">Prenhas / Vacas que passaram no DG</div>
+        </div>
+        <div class="taxa-card">
+          <div class="taxa-title">⚠️ Faltas no DG</div>
+          <div class="taxa-bar"><div class="taxa-fill orange" style="width:${s.totalInseminacoes > 0 ? Math.min((s.faltasNoDG/s.totalInseminacoes)*100,100) : 0}%"></div></div>
+          <div class="taxa-percent" style="color:#e65100">${s.faltasNoDG}</div>
+          <div class="taxa-detail">Inseminadas que não passaram no DG</div>
+        </div>
+      </div>
+
+      <div class="section-title">📋 Resumo</div>
+      <div class="detail-grid">
+        <div class="detail-item"><label>Machos</label><span>${s.totalMachos}</span></div>
+        <div class="detail-item"><label>Inseminações Concluídas</label><span>${s.inseminacoesConcluidas}</span></div>
+        <div class="detail-item"><label>Prenhezes Canceladas</label><span>${s.prenhezesCanceladas}</span></div>
+        <div class="detail-item"><label>Nascimentos Mortos</label><span>${s.nascimentosMortos}</span></div>
+        <div class="detail-item"><label>Desmames Pendentes</label><span>${s.desmamesPendentes}</span></div>
+      </div>
+    `;
+  } catch(e) {
+    document.getElementById('dashboard-content').innerHTML = `<div class="alert alert-warning">⚠️ Erro ao carregar: ${e.message}</div>`;
+  }
+}
+
+// ===== ANIMAIS =====
+async function loadAnimais() {
+  document.getElementById('table-animais-container').innerHTML = '<div class="loading"><div class="spinner"></div>Carregando...</div>';
+  try {
+    const allAnimais = await api('/animais');
+    const animais = FAZENDA_ATUAL ? allAnimais.filter(a => (a.proprietario || '').includes(FAZENDA_ATUAL)) : allAnimais;
+    if (!animais.length) {
+      document.getElementById('table-animais-container').innerHTML = '<div class="empty-state"><div class="icon">🐄</div><p>Nenhum animal cadastrado ainda.</p></div>';
+      return;
+    }
+    document.getElementById('table-animais-container').innerHTML = `
+      <table id="table-animais">
+        <thead><tr>
+          <th>Brinco</th><th>Nome</th><th>Tipo</th><th>Sexo</th>
+          <th>Raça</th><th>Nasc.</th><th>Peso</th><th>Status</th><th>Ações</th>
+        </tr></thead>
+        <tbody>
+          ${animais.map(a => `
+            <tr>
+              <td><strong>${a.brinco}</strong></td>
+              <td>${a.nome || '-'}</td>
+              <td>${a.tipo || '-'}</td>
+              <td>${a.sexo === 'FEMEA' ? '♀️ Fêmea' : '♂️ Macho'}</td>
+              <td>${a.raca || '-'}</td>
+              <td>${fmt(a.dataNascimento)}</td>
+              <td>${a.peso ? a.peso + ' kg' : '-'}</td>
+              <td><span class="badge ${a.status === 'ATIVO' ? 'badge-success' : a.status === 'VENDIDO' ? 'badge-info' : 'badge-danger'}">${a.status}</span></td>
+              <td>
+                <button class="btn btn-danger btn-sm" onclick="deletarAnimal(${a.id}, '${a.brinco}')">🗑️</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch(e) {
+    document.getElementById('table-animais-container').innerHTML = `<div class="alert alert-warning">⚠️ ${e.message}</div>`;
+  }
+}
+
+async function salvarAnimal() {
+  const brinco = document.getElementById('animal-brinco').value;
+  const tipo = document.getElementById('animal-tipo').value;
+  const sexo = document.getElementById('animal-sexo').value;
+  if (!brinco || !tipo || !sexo) { toast('Preencha os campos obrigatórios', 'warning'); return; }
+  try {
+    await api('/animais', 'POST', {
+      brinco, tipo, sexo,
+      nome: document.getElementById('animal-nome').value || null,
+      status: document.getElementById('animal-status').value,
+      dataNascimento: document.getElementById('animal-dataNascimento').value || null,
+      raca: document.getElementById('animal-raca').value || null,
+      peso: document.getElementById('animal-peso').value ? parseFloat(document.getElementById('animal-peso').value) : null,
+      proprietario: document.getElementById('animal-proprietario').value || null,
+      observacoes: document.getElementById('animal-observacoes').value || null
+    });
+    toast('Animal cadastrado com sucesso!');
+    closeModal('modal-animal');
+    document.getElementById('form-animal').reset();
+    loadAnimais();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+async function deletarAnimal(id, brinco) {
+  if (!confirm(`Excluir animal ${brinco}?`)) return;
+  try {
+    await api('/animais/' + id, 'DELETE');
+    toast('Animal excluído!');
+    loadAnimais();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+// ===== INSEMINAÇÕES =====
+async function loadFemeasSelect() {
+  try {
+    const femeas = await api('/animais/femeas/ativas');
+    const sel = document.getElementById('ins-animalId');
+    sel.innerHTML = '<option value="">Selecione a fêmea...</option>';
+    femeas.forEach(f => sel.innerHTML += `<option value="${f.id}">${f.brinco} - ${f.nome || f.raca || 'Sem nome'}</option>`);
+  } catch(e) {}
+}
+
+function updateInsPrevisao() {
+  const data = document.getElementById('ins-dataCobertura').value;
+  const periodoSel = document.getElementById('ins-periodoGestacao').value;
+  const customGrp = document.getElementById('ins-custom-periodo-group');
+  if (periodoSel === 'custom') {
+    customGrp.style.display = 'block';
+    return;
+  } else {
+    customGrp.style.display = 'none';
+  }
+  if (data && periodoSel) {
+    const prev = addDays(data, periodoSel);
+    document.getElementById('ins-previsao-data').textContent = prev;
+    document.getElementById('ins-previsao-info').style.display = 'block';
+  }
+}
+
+async function loadInseminacoes() {
+  document.getElementById('table-inseminacoes-container').innerHTML = '<div class="loading"><div class="spinner"></div>Carregando...</div>';
+  try {
+    const allAnimais = await api('/animais');
+    const animalIds = new Set(
+      FAZENDA_ATUAL ? allAnimais.filter(a => (a.proprietario||'').includes(FAZENDA_ATUAL)).map(a=>a.id) : allAnimais.map(a=>a.id)
+    );
+    const animalMap = Object.fromEntries(allAnimais.map(a => [a.id, a]));
+    const allIns = await api('/inseminacoes');
+    const ins = allIns.filter(i => animalIds.has(i.animalId));
+    if (!ins.length) {
+      document.getElementById('table-inseminacoes-container').innerHTML = '<div class="empty-state"><div class="icon">🔬</div><p>Nenhuma inseminação registrada.</p></div>';
+      return;
+    }
+    document.getElementById('table-inseminacoes-container').innerHTML = `
+      <table id="table-inseminacoes">
+        <thead><tr>
+          <th>Animal</th><th>Data Cobertura</th><th>Tipo</th><th>Reprodutor</th>
+          <th>Previsão Nasc.</th><th>Resultado DG</th><th>Ações</th>
+        </tr></thead>
+        <tbody>
+          ${ins.map(i => {
+            const a = animalMap[i.animalId] || {};
+            const res = i.resultadoDiagnostico || 'PENDENTE';
+            return `
+            <tr>
+              <td><strong>${a.brinco || '-'}</strong>${a.nome ? ' - ' + a.nome : ''}</td>
+              <td>${fmt(i.dataInseminacao)}</td>
+              <td><span class="badge badge-info">${i.reprodutor || '-'}</span></td>
+              <td>${fmt(i.dataDiagnostico) || '-'}</td>
+              <td><span class="badge ${res==='PRENHA'?'badge-success':res==='NAO_PRENHA'?'badge-danger':'badge-warning'}">${res==='NAO_PRENHA'?'NÃO PRENHA':res}</span></td>
+              <td><button class="btn btn-danger btn-sm" onclick="deletarInseminacao(${i.id})">🗑️</button></td>
+            </tr>
+          `}).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch(e) {
+    document.getElementById('table-inseminacoes-container').innerHTML = `<div class="alert alert-warning">⚠️ ${e.message}</div>`;
+  }
+}
+
+async function salvarInseminacao() {
+  const animalId = document.getElementById('ins-animalId').value;
+  const dataCobertura = document.getElementById('ins-dataCobertura').value;
+  if (!animalId || !dataCobertura) { toast('Preencha os campos obrigatórios', 'warning'); return; }
+  const periodoSel = document.getElementById('ins-periodoGestacao').value;
+  const periodo = periodoSel === 'custom' ? parseInt(document.getElementById('ins-periodoCustom').value) : parseInt(periodoSel);
+  const previsao = addDaysISO(dataCobertura, periodo);
+  try {
+    await api('/inseminacoes', 'POST', {
+      animal: { id: parseInt(animalId) },
+      dataCobertura,
+      tipo: document.getElementById('ins-tipo').value,
+      reprodutor: document.getElementById('ins-reprodutor').value || null,
+      periodoGestacao: periodo,
+      previsaoNascimento: previsao,
+      observacoes: document.getElementById('ins-observacoes').value || null
+    });
+    toast('Inseminação registrada com sucesso!');
+    closeModal('modal-inseminacao');
+    document.getElementById('form-inseminacao').reset();
+    document.getElementById('ins-previsao-info').style.display = 'none';
+    loadInseminacoes();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+async function deletarInseminacao(id) {
+  if (!confirm('Excluir esta inseminação?')) return;
+  try {
+    await api('/inseminacoes/' + id, 'DELETE');
+    toast('Inseminação excluída!');
+    loadInseminacoes();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+// ===== PRENHEZES =====
+async function loadInseminacoesSelect() {
+  try {
+    const ins = await api('/inseminacoes');
+    const sel = document.getElementById('prn-inseminacaoId');
+    sel.innerHTML = '<option value="">Selecione a inseminação...</option>';
+    ins.forEach(i => sel.innerHTML += `<option value="${i.id}">${i.animal?.brinco || '?'} - ${fmt(i.dataCobertura)} (${i.tipo?.replace('_',' ')})</option>`);
+  } catch(e) {}
+}
+
+async function loadPrenhezes() {
+  document.getElementById('table-prenhezes-container').innerHTML = '<div class="loading"><div class="spinner"></div>Carregando...</div>';
+  try {
+    const allAnimais = await api('/animais');
+    const animalIds = new Set(
+      FAZENDA_ATUAL ? allAnimais.filter(a => (a.proprietario||'').includes(FAZENDA_ATUAL)).map(a=>a.id) : allAnimais.map(a=>a.id)
+    );
+    const animalMap = Object.fromEntries(allAnimais.map(a => [a.id, a]));
+    const allPrn = await api('/prenhezes');
+    const prn = allPrn.filter(p => animalIds.has(p.animalId));
+    if (!prn.length) {
+      document.getElementById('table-prenhezes-container').innerHTML = '<div class="empty-state"><div class="icon">🤰</div><p>Nenhuma prenhez registrada.</p></div>';
+      return;
+    }
+    document.getElementById('table-prenhezes-container').innerHTML = `
+      <table id="table-prenhezes">
+        <thead><tr>
+          <th>Animal</th><th>Data DG</th><th>Resultado</th>
+          <th>Previsão Nascimento</th><th>Observações</th><th>Ações</th>
+        </tr></thead>
+        <tbody>
+          ${prn.map(p => {
+            const a = animalMap[p.animalId] || {};
+            const st = p.status || '-';
+            return `
+            <tr>
+              <td><strong>${a.brinco || '-'}</strong>${a.nome ? ' - ' + a.nome : ''}</td>
+              <td>${fmt(p.dataConfirmacao)}</td>
+              <td><span class="badge ${st==='CONFIRMADA'?'badge-success':st==='CANCELADA'?'badge-danger':'badge-warning'}">${st}</span></td>
+              <td>${fmt(p.previsaoNascimento)}</td>
+              <td>${p.observacoes || '-'}</td>
+              <td><button class="btn btn-danger btn-sm" onclick="deletarPrenhez(${p.id})">🗑️</button></td>
+            </tr>
+          `}).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch(e) {
+    document.getElementById('table-prenhezes-container').innerHTML = `<div class="alert alert-warning">⚠️ ${e.message}</div>`;
+  }
+}
+
+async function salvarPrenhez() {
+  const inseminacaoId = document.getElementById('prn-inseminacaoId').value;
+  const dataDiagnostico = document.getElementById('prn-dataDiagnostico').value;
+  const resultado = document.getElementById('prn-resultado').value;
+  if (!inseminacaoId || !dataDiagnostico || !resultado) { toast('Preencha os campos obrigatórios', 'warning'); return; }
+  try {
+    await api('/prenhezes', 'POST', {
+      inseminacao: { id: parseInt(inseminacaoId) },
+      dataDiagnostico,
+      resultado,
+      previsaoNascimento: document.getElementById('prn-previsaoNascimento').value || null,
+      observacoes: document.getElementById('prn-observacoes').value || null
+    });
+    toast('Prenhez registrada com sucesso!');
+    closeModal('modal-prenhez');
+    document.getElementById('form-prenhez').reset();
+    loadPrenhezes();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+async function deletarPrenhez(id) {
+  if (!confirm('Excluir esta prenhez?')) return;
+  try {
+    await api('/prenhezes/' + id, 'DELETE');
+    toast('Prenhez excluída!');
+    loadPrenhezes();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+// ===== NASCIMENTOS =====
+async function loadPrenhezesPrenhasSelect() {
+  try {
+    const prn = await api('/prenhezes');
+    const sel = document.getElementById('nasc-prenhezId');
+    sel.innerHTML = '<option value="">Selecione a prenhez...</option>';
+    prn.filter(p => p.resultado === 'PRENHA').forEach(p =>
+      sel.innerHTML += `<option value="${p.id}">${p.inseminacao?.animal?.brinco || '?'} - DG: ${fmt(p.dataDiagnostico)}</option>`
+    );
+  } catch(e) {}
+}
+
+function updateNascPrevisao() {
+  const data = document.getElementById('nasc-dataNascimento').value;
+  const dias = document.getElementById('nasc-diasDesmame').value;
+  if (data && dias && dias !== 'custom') {
+    const prev = addDays(data, dias);
+    document.getElementById('nasc-desmame-data').textContent = prev + ` (${dias} dias)`;
+    document.getElementById('nasc-desmame-info').style.display = 'block';
+  }
+}
+
+async function loadNascimentos() {
+  document.getElementById('table-nascimentos-container').innerHTML = '<div class="loading"><div class="spinner"></div>Carregando...</div>';
+  try {
+    const allAnimais = await api('/animais');
+    const animalIds = new Set(
+      FAZENDA_ATUAL ? allAnimais.filter(a => (a.proprietario||'').includes(FAZENDA_ATUAL)).map(a=>a.id) : allAnimais.map(a=>a.id)
+    );
+    const animalMap = Object.fromEntries(allAnimais.map(a => [a.id, a]));
+    const allNasc = await api('/nascimentos');
+    const nasc = allNasc.filter(n => animalIds.has(n.animalId));
+    if (!nasc.length) {
+      document.getElementById('table-nascimentos-container').innerHTML = '<div class="empty-state"><div class="icon">🐣</div><p>Nenhum nascimento registrado.</p></div>';
+      return;
+    }
+    document.getElementById('table-nascimentos-container').innerHTML = `
+      <table id="table-nascimentos">
+        <thead><tr>
+          <th>Mãe</th><th>Data Nasc.</th><th>Status</th><th>Sexo</th>
+          <th>Peso</th><th>Brinco Filhote</th><th>Prev. Desmame</th><th>Ações</th>
+        </tr></thead>
+        <tbody>
+          ${nasc.map(n => {
+            const a = animalMap[n.animalId] || {};
+            const st = n.statusNascimento || '-';
+            return `
+            <tr>
+              <td><strong>${a.brinco || '-'}</strong>${a.nome ? ' - ' + a.nome : ''}</td>
+              <td>${fmt(n.dataNascimento)}</td>
+              <td><span class="badge ${st==='VIVO'?'badge-success':'badge-danger'}">${st}</span></td>
+              <td>${n.sexoFilhote ? (n.sexoFilhote==='MACHO'?'♂️ Macho':'♀️ Fêmea') : '-'}</td>
+              <td>${n.pesoNascimento ? n.pesoNascimento + ' kg' : '-'}</td>
+              <td>${n.brincoFilhote || '-'} ${n.nomeFilhote ? '(' + n.nomeFilhote + ')' : ''}</td>
+              <td>${fmt(n.previsaoDesmame) || '-'}</td>
+              <td><button class="btn btn-danger btn-sm" onclick="deletarNascimento(${n.id})">🗑️</button></td>
+            </tr>
+          `}).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch(e) {
+    document.getElementById('table-nascimentos-container').innerHTML = `<div class="alert alert-warning">⚠️ ${e.message}</div>`;
+  }
+}
+
+async function salvarNascimento() {
+  const prenhezId = document.getElementById('nasc-prenhezId').value;
+  const dataNascimento = document.getElementById('nasc-dataNascimento').value;
+  const status = document.getElementById('nasc-status').value;
+  if (!prenhezId || !dataNascimento || !status) { toast('Preencha os campos obrigatórios', 'warning'); return; }
+  const diasSel = document.getElementById('nasc-diasDesmame').value;
+  const dias = diasSel === 'custom' ? 90 : parseInt(diasSel);
+  const previsaoDesmame = addDaysISO(dataNascimento, dias);
+  try {
+    await api('/nascimentos', 'POST', {
+      prenhez: { id: parseInt(prenhezId) },
+      dataNascimento,
+      status,
+      sexo: document.getElementById('nasc-sexo').value || null,
+      pesoNascimento: document.getElementById('nasc-peso').value ? parseFloat(document.getElementById('nasc-peso').value) : null,
+      brincoFilhote: document.getElementById('nasc-brincoFilhote').value || null,
+      diasParaDesmame: dias,
+      previsaoDesmame,
+      observacoes: document.getElementById('nasc-observacoes').value || null
+    });
+    toast('Nascimento registrado com sucesso!');
+    closeModal('modal-nascimento');
+    document.getElementById('form-nascimento').reset();
+    document.getElementById('nasc-desmame-info').style.display = 'none';
+    loadNascimentos();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+async function deletarNascimento(id) {
+  if (!confirm('Excluir este nascimento?')) return;
+  try {
+    await api('/nascimentos/' + id, 'DELETE');
+    toast('Nascimento excluído!');
+    loadNascimentos();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+// ===== DESMAMES =====
+async function loadNascimentosSelect() {
+  try {
+    const nasc = await api('/nascimentos');
+    const sel = document.getElementById('dsm-nascimentoId');
+    sel.innerHTML = '<option value="">Selecione o nascimento...</option>';
+    nasc.forEach(n => sel.innerHTML += `<option value="${n.id}">${n.prenhez?.inseminacao?.animal?.brinco || '?'} - ${fmt(n.dataNascimento)} (${n.brincoFilhote || 'sem brinco'})</option>`);
+  } catch(e) {}
+}
+
+async function loadDesmames() {
+  document.getElementById('table-desmames-container').innerHTML = '<div class="loading"><div class="spinner"></div>Carregando...</div>';
+  try {
+    const allAnimais = await api('/animais');
+    const animalIds = new Set(
+      FAZENDA_ATUAL ? allAnimais.filter(a => (a.proprietario||'').includes(FAZENDA_ATUAL)).map(a=>a.id) : allAnimais.map(a=>a.id)
+    );
+    const animalMap = Object.fromEntries(allAnimais.map(a => [a.id, a]));
+    const allDsm = await api('/desmames');
+    const dsm = allDsm.filter(d => animalIds.has(d.animalId));
+    if (!dsm.length) {
+      document.getElementById('table-desmames-container').innerHTML = '<div class="empty-state"><div class="icon">🍼</div><p>Nenhum desmame registrado.</p></div>';
+      return;
+    }
+    document.getElementById('table-desmames-container').innerHTML = `
+      <table id="table-desmames">
+        <thead><tr>
+          <th>Mãe</th><th>Filhote</th><th>Data Desmame</th>
+          <th>Peso Desmame</th><th>Status</th><th>Ações</th>
+        </tr></thead>
+        <tbody>
+          ${dsm.map(d => {
+            const a = animalMap[d.animalId] || {};
+            const st = d.status || '-';
+            return `
+            <tr>
+              <td><strong>${a.brinco || '-'}</strong>${a.nome ? ' - ' + a.nome : ''}</td>
+              <td>${fmt(d.dataNascimento) || '-'}</td>
+              <td>${fmt(d.dataDesmameReal) || fmt(d.previsaoDesmame) || '-'}</td>
+              <td>${d.pesoDesmame ? d.pesoDesmame + ' kg' : '-'}</td>
+              <td><span class="badge ${st==='REALIZADO'?'badge-success':'badge-warning'}">${st}</span></td>
+              <td><button class="btn btn-danger btn-sm" onclick="deletarDesmame(${d.id})">🗑️</button></td>
+            </tr>
+          `}).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch(e) {
+    document.getElementById('table-desmames-container').innerHTML = `<div class="alert alert-warning">⚠️ ${e.message}</div>`;
+  }
+}
+
+async function salvarDesmame() {
+  const nascimentoId = document.getElementById('dsm-nascimentoId').value;
+  const dataDesmame = document.getElementById('dsm-dataDesmame').value;
+  if (!nascimentoId || !dataDesmame) { toast('Preencha os campos obrigatórios', 'warning'); return; }
+  try {
+    await api('/desmames', 'POST', {
+      nascimento: { id: parseInt(nascimentoId) },
+      dataDesmame,
+      pesoDesmame: document.getElementById('dsm-peso').value ? parseFloat(document.getElementById('dsm-peso').value) : null,
+      status: document.getElementById('dsm-status').value,
+      observacoes: document.getElementById('dsm-observacoes').value || null
+    });
+    toast('Desmame registrado com sucesso!');
+    closeModal('modal-desmame');
+    document.getElementById('form-desmame').reset();
+    loadDesmames();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+async function deletarDesmame(id) {
+  if (!confirm('Excluir este desmame?')) return;
+  try {
+    await api('/desmames/' + id, 'DELETE');
+    toast('Desmame excluído!');
+    loadDesmames();
+  } catch(e) { toast('Erro: ' + e.message, 'error'); }
+}
+
+// ===== INIT =====
+loadDashboard();
+</script>
+</body>
+</html>

@@ -18,6 +18,7 @@ public class AnimalService {
     private final AnimalRepository animalRepository;
 
     public AnimalDTO criarAnimal(AnimalDTO dto) {
+        Animal.StatusAnimal status = dto.getStatus() != null ? dto.getStatus() : Animal.StatusAnimal.ATIVO;
         Animal animal = Animal.builder()
                 .brinco(dto.getBrinco())
                 .nome(dto.getNome())
@@ -26,8 +27,9 @@ public class AnimalService {
                 .dataNascimento(dto.getDataNascimento())
                 .raca(dto.getRaca())
                 .peso(dto.getPeso())
+                .proprietario(dto.getProprietario())
                 .observacoes(dto.getObservacoes())
-                .status(Animal.StatusAnimal.ATIVO)
+                .status(status)
                 .build();
 
         Animal salvo = animalRepository.save(animal);
@@ -41,8 +43,9 @@ public class AnimalService {
         animal.setNome(dto.getNome());
         animal.setRaca(dto.getRaca());
         animal.setPeso(dto.getPeso());
+        animal.setProprietario(dto.getProprietario());
         animal.setObservacoes(dto.getObservacoes());
-        animal.setStatus(dto.getStatus());
+        if (dto.getStatus() != null) animal.setStatus(dto.getStatus());
 
         Animal atualizado = animalRepository.save(animal);
         return converterParaDTO(atualizado);
@@ -102,6 +105,7 @@ public class AnimalService {
                 .dataNascimento(animal.getDataNascimento())
                 .raca(animal.getRaca())
                 .peso(animal.getPeso())
+                .proprietario(animal.getProprietario())
                 .observacoes(animal.getObservacoes())
                 .status(animal.getStatus())
                 .build();

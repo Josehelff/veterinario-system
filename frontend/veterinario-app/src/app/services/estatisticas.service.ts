@@ -2,15 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Estatisticas } from '../models/estatisticas.model';
+import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class EstatisticasService {
-  private apiUrl = 'http://localhost:8080/api/estatisticas';
-
-  constructor(private http: HttpClient) { }
-
+  private apiUrl = `${environment.apiUrl}/estatisticas`;
+  constructor(private http: HttpClient) {}
   obterEstatisticas(): Observable<Estatisticas> {
     return this.http.get<Estatisticas>(this.apiUrl);
   }

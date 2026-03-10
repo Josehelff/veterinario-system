@@ -24,7 +24,7 @@ public class Animal {
     @Column(nullable = false, unique = true)
     private String brinco;
 
-    @Column(nullable = false)
+    @Column
     private String nome;
 
     @Column(nullable = false)
@@ -35,7 +35,7 @@ public class Animal {
     @Enumerated(EnumType.STRING)
     private SexoAnimal sexo;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate dataNascimento;
 
     @Column
@@ -45,6 +45,9 @@ public class Animal {
     private Double peso;
 
     @Column
+    private String proprietario;
+
+    @Column(length = 1000)
     private String observacoes;
 
     @Column(nullable = false)
@@ -72,6 +75,6 @@ public class Animal {
     }
 
     public enum StatusAnimal {
-        ATIVO, INATIVO, VENDIDO, FALECIDO
+        ATIVO, INATIVO, VENDIDO, MORTO, FALECIDO
     }
 }
